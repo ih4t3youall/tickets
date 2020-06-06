@@ -16,7 +16,7 @@ class Ticket:
         self.pr_url = pr_url
         self.branch_url = branch_url
         self.comments = comments
-        self.finish_date = ''
+        self.finish_date = None
 
 
 class Disk:

@@ -1,6 +1,7 @@
 from PyQt5 import QtWidgets,QtGui
 from objects import Ticket
 from objects import Disk
+from datetime import date
 
 from ui.ticketui import Ui_MainWindow  # importing our generated file
 
@@ -21,39 +22,46 @@ class mywindow(QtWidgets.QMainWindow):
         #init components
         self.init_components()
         self.ui.setupUi(self)
-        self.ui.textname.insertPlainText("hola")
         self.load_combobox()
         self.load_from_disk()
         self.init_search_box()
         
         #listeners
-        self.ui.comborepo.view().pressed.connect(self.combobox_action)
         self.ui.add_button.clicked.connect(self.add_button_action)
         self.ui.delete_button.clicked.connect(self.delete_button_action)
         self.ui.save_button.clicked.connect(self.save_button_action)
         self.ui.new_button.clicked.connect(self.new_button_action)
         self.ui.load_button.clicked.connect(self.load_button_action)
         self.ui.test.clicked.connect(self.test)
+        self.ui.checkBox.stateChanged.connect(self.checkbox_action)
+        self.ui.comborepo.currentIndexChanged.connect(self.combobox_action)
+
 
     def combobox_action(self):
         print("todo")
+        self.ui.textrepo.clear()
+        combo_current_text = self.ui.comborepo.currentText()
+        text_to_set = self.repos[combo_current_text]
+        self.ui.textrepo.insertPlainText(text_to_set)
         #self.ui.textrepo.clear()
         #combo_current_text = self.ui.comborepo.currentText()
         #text_to_set = self.repos[combo_current_text]
         #self.ui.textrepo.insertPlainText(text_to_set)
 
     def init_components(self):
-        self.repos['exchange'] = 'urlExchange'
-        self.repos['web-api'] = 'urlWebApi'
+        self.repos['nothing'] = 'nothing selected'
+        self.repos['exchange'] = 'https://github.com/AdaptiveConsulting/exchange'
+        self.repos['web-api'] = 'https://github.com/ErisExchange/trading-web-api'
 
     def init_search_box(self):
-        for ticket in self.ticket_list :
+        for ticket in self.ticket_list:
             self.ui.listresult.addItem(ticket.name)
 
     def onClicked(self):
         print("pass here")
         
     def load_combobox(self):
+        self.ui.comborepo.addItem("nothing")
         self.ui.comborepo.addItem("exchange")
         self.ui.comborepo.addItem("web-api")
         #self.ui.comborepo.setCurrentIndex(0)
@@ -87,17 +95,15 @@ class mywindow(QtWidgets.QMainWindow):
         ticket = self.grab_from_view()
         ticket_searched = self.search_ticket(ticket.name)
         if ticket_searched == None:
-            print('is none')
+            print('adding new')
             self.ticket_list.append(ticket)
+            self.ui.listresult.addItem(ticket.name)
             return
-
-        if (ticket.name == ticket_searched.name):
-            print('updating')
-            self.update_ticket(ticket_searched,ticket)
         else:
-            self.ticket_list.append(ticket)
+            print('updating')
+            self.update_ticket(ticket)
 
-    def update_ticket(self,ticket,new_ticket):
+    def update_ticket(self,new_ticket):
         cont =0
         for ticket_in_list in self.ticket_list:
             if ticket_in_list.name == new_ticket.name:
@@ -106,18 +112,16 @@ class mywindow(QtWidgets.QMainWindow):
         self.ticket_list.pop(cont)
         self.ticket_list.append(new_ticket)
 
-
     def delete_button_action(self):
         ticket_to_delete = self.grab_from_view()
         index =0
         for ticket in self.ticket_list:
             if ticket.name == ticket_to_delete.name:
-                print(' i was here')
+                print('i was here')
                 break
             index = index +1
         self.ticket_list.pop(index)
         self.removeSel()
-
 
     def removeSel(self):
         listItems = self.ui.listresult.selectedItems()
@@ -143,7 +147,24 @@ class mywindow(QtWidgets.QMainWindow):
         selected_item = self.ui.listresult.currentItem().text()
         print(selected_item)
         selected_ticket = self.search_ticket(selected_item)
-        self.display_ticket(selected_ticket )
+        self.display_ticket(selected_ticket)
+        print(self.print_ticket(selected_ticket))
+        if selected_ticket.finish_date == None:
+            self.ui.checkBox.setChecked(False)
+        else:
+            self.ui.checkBox.setChecked(True)
+
+    def checkbox_action(self):
+        if self.ui.checkBox.isChecked():
+            print("CHECKED!")
+            ticket = self.search_ticket(self.grab_from_view().name)
+            ticket.finish_date = date.today()
+            self.update_ticket(ticket)
+        else:
+            print("UNCHECKED!")
+            ticket = self.search_ticket(self.grab_from_view().name)
+            ticket.finish_date = None
+            self.update_ticket(ticket)
 
     #test utility
     def create_a_ticket(self):
