@@ -2,6 +2,7 @@ from PyQt5 import QtWidgets,QtGui
 from objects import Ticket
 from objects import Disk
 from datetime import date
+import pyperclip
 
 from ui.ticketui import Ui_MainWindow  # importing our generated file
 
@@ -36,6 +37,13 @@ class mywindow(QtWidgets.QMainWindow):
         self.ui.checkBox.stateChanged.connect(self.checkbox_action)
         self.ui.comborepo.currentIndexChanged.connect(self.combobox_action)
 
+        #copy
+        self.ui.copy_name.clicked.connect(lambda: self.copy_button_action('name'))
+        self.ui.copy_jira.clicked.connect(lambda: self.copy_button_action('jira'))
+        self.ui.copy_repo.clicked.connect(lambda: self.copy_button_action('repo'))
+        self.ui.copy_pr.clicked.connect(lambda: self.copy_button_action('pr'))
+        self.ui.copy_branch.clicked.connect(lambda: self.copy_button_action('branch'))
+
 
     def combobox_action(self):
         print("todo")
@@ -43,10 +51,6 @@ class mywindow(QtWidgets.QMainWindow):
         combo_current_text = self.ui.comborepo.currentText()
         text_to_set = self.repos[combo_current_text]
         self.ui.textrepo.insertPlainText(text_to_set)
-        #self.ui.textrepo.clear()
-        #combo_current_text = self.ui.comborepo.currentText()
-        #text_to_set = self.repos[combo_current_text]
-        #self.ui.textrepo.insertPlainText(text_to_set)
 
     def init_components(self):
         self.repos['nothing'] = 'nothing selected'
@@ -102,6 +106,19 @@ class mywindow(QtWidgets.QMainWindow):
         else:
             print('updating')
             self.update_ticket(ticket)
+
+    def  copy_button_action(self,field):
+        ticket = self.grab_from_view()
+        if field == 'repo':
+            pyperclip.copy(ticket.repo.strip())
+        if field == 'jira':
+            pyperclip.copy(ticket.jiraurl.strip())
+        if field == 'pr':
+            pyperclip.copy(ticket.pr_url.strip())
+        if field == 'branch':
+            pyperclip.copy(ticket.branch_url.strip())
+        if field == 'name':
+            pyperclip.copy(ticket.name.strip())
 
     def update_ticket(self,new_ticket):
         cont =0
