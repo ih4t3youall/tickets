@@ -28,12 +28,11 @@ class mywindow(QtWidgets.QMainWindow):
         self.init_search_box()
         
         #listeners
-        self.ui.add_button.clicked.connect(self.add_button_action)
+        #self.ui.add_button.clicked.connect(self.add_button_action)
         self.ui.delete_button.clicked.connect(self.delete_button_action)
         self.ui.save_button.clicked.connect(self.save_button_action)
         self.ui.new_button.clicked.connect(self.new_button_action)
         self.ui.load_button.clicked.connect(self.load_button_action)
-        self.ui.test.clicked.connect(self.test)
         self.ui.checkBox.stateChanged.connect(self.checkbox_action)
         self.ui.comborepo.currentIndexChanged.connect(self.combobox_action)
 
@@ -56,6 +55,7 @@ class mywindow(QtWidgets.QMainWindow):
         self.repos['nothing'] = 'nothing selected'
         self.repos['exchange'] = 'https://github.com/AdaptiveConsulting/exchange'
         self.repos['web-api'] = 'https://github.com/ErisExchange/trading-web-api'
+        self.repos['wlashTrader'] = 'https://github.com/ErisExchange/tradingWebApiClient'
 
     def init_search_box(self):
         for ticket in self.ticket_list:
@@ -68,6 +68,7 @@ class mywindow(QtWidgets.QMainWindow):
         self.ui.comborepo.addItem("nothing")
         self.ui.comborepo.addItem("exchange")
         self.ui.comborepo.addItem("web-api")
+        self.ui.comborepo.addItem("wlashTrader")
         #self.ui.comborepo.setCurrentIndex(0)
         #self.ui.textrepo.insertPlainText(self.repos['exchange'])
 
@@ -95,17 +96,6 @@ class mywindow(QtWidgets.QMainWindow):
         self.ui.textbranch.insertPlainText(ticket.branch_url)
         self.ui.commenttext.setPlainText(ticket.comments)
 
-    def add_button_action(self):
-        ticket = self.grab_from_view()
-        ticket_searched = self.search_ticket(ticket.name)
-        if ticket_searched == None:
-            print('adding new')
-            self.ticket_list.append(ticket)
-            self.ui.listresult.addItem(ticket.name)
-            return
-        else:
-            print('updating')
-            self.update_ticket(ticket)
 
     def  copy_button_action(self,field):
         ticket = self.grab_from_view()
@@ -147,6 +137,16 @@ class mywindow(QtWidgets.QMainWindow):
             self.ui.listresult.takeItem(self.ui.listresult.row(item))
 
     def save_button_action(self):
+        ticket = self.grab_from_view()
+        ticket_searched = self.search_ticket(ticket.name)
+        if ticket_searched == None:
+            print('adding new')
+            self.ticket_list.append(ticket)
+            self.ui.listresult.addItem(ticket.name)
+            return
+        else:
+            print('updating')
+            self.update_ticket(ticket)
         self.disk.save_to_disk(self.ticket_list)
 
     def clear_all_form(self):
@@ -194,12 +194,6 @@ class mywindow(QtWidgets.QMainWindow):
         ticket = Ticket(text_name,text_jira_url,text_repo,text_pr_url,text_branch_url,text_description)
         self.display_ticket(ticket)
         self.ticket_list.append(ticket)
-
-    def test(self):
-        lizta = self.disk.load_from_disk()
-        for ticket in lizta:
-            self.print_ticket(ticket)
-
 
     def print_ticket_list(self):
         for ticket in self.ticket_list:
