@@ -33,6 +33,8 @@ class mywindow(QtWidgets.QMainWindow):
         self.ui.save_button.clicked.connect(self.save_button_action)
         self.ui.new_button.clicked.connect(self.new_button_action)
         self.ui.load_button.clicked.connect(self.load_button_action)
+        self.ui.load_active.clicked.connect(self.load_active_button_action)
+        self.ui.load_all.clicked.connect(self.load_all_button_action)
         self.ui.checkBox.stateChanged.connect(self.checkbox_action)
         self.ui.comborepo.currentIndexChanged.connect(self.combobox_action)
 
@@ -119,6 +121,7 @@ class mywindow(QtWidgets.QMainWindow):
         self.ticket_list.pop(cont)
         self.ticket_list.append(new_ticket)
 
+
     def delete_button_action(self):
         ticket_to_delete = self.grab_from_view()
         index =0
@@ -159,6 +162,16 @@ class mywindow(QtWidgets.QMainWindow):
 
     def new_button_action(self):
         self.clear_all_form()
+    def load_all_button_action(self):
+        self.ui.listresult.clear()
+        for ticket in self.ticket_list:
+            self.ui.listresult.addItem(ticket.name)
+
+    def load_active_button_action(self):
+        self.ui.listresult.clear()
+        newTicketList = list(filter(lambda x :  x.finish_date == None ,self.ticket_list))
+        for ticket in newTicketList:
+            self.ui.listresult.addItem(ticket.name)
 
     def load_button_action(self):
         selected_item = self.ui.listresult.currentItem().text()
