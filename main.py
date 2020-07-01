@@ -146,7 +146,6 @@ class mywindow(QtWidgets.QMainWindow):
             print('adding new')
             self.ticket_list.append(ticket)
             self.ui.listresult.addItem(ticket.name)
-            return
         else:
             print('updating')
             self.update_ticket(ticket)
@@ -162,6 +161,7 @@ class mywindow(QtWidgets.QMainWindow):
 
     def new_button_action(self):
         self.clear_all_form()
+
     def load_all_button_action(self):
         self.ui.listresult.clear()
         for ticket in self.ticket_list:
