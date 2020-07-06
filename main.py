@@ -37,6 +37,7 @@ class mywindow(QtWidgets.QMainWindow):
         self.ui.load_all.clicked.connect(self.load_all_button_action)
         self.ui.checkBox.stateChanged.connect(self.checkbox_action)
         self.ui.comborepo.currentIndexChanged.connect(self.combobox_action)
+        self.ui.copy_selected_button.clicked.connect(self.copy_selected_button_action)
 
         #copy
         self.ui.copy_name.clicked.connect(lambda: self.copy_button_action('name'))
@@ -47,7 +48,6 @@ class mywindow(QtWidgets.QMainWindow):
 
 
     def combobox_action(self):
-        print("todo")
         self.ui.textrepo.clear()
         combo_current_text = self.ui.comborepo.currentText()
         text_to_set = self.repos[combo_current_text]
@@ -63,14 +63,12 @@ class mywindow(QtWidgets.QMainWindow):
         for ticket in self.ticket_list:
             self.ui.listresult.addItem(ticket.name)
 
-    def onClicked(self):
-        print("pass here")
-        
     def load_combobox(self):
         self.ui.comborepo.addItem("nothing")
         self.ui.comborepo.addItem("exchange")
         self.ui.comborepo.addItem("web-api")
         self.ui.comborepo.addItem("wlashTrader")
+        #TODO select the correct combo
         #self.ui.comborepo.setCurrentIndex(0)
         #self.ui.textrepo.insertPlainText(self.repos['exchange'])
 
@@ -166,6 +164,11 @@ class mywindow(QtWidgets.QMainWindow):
         self.ui.listresult.clear()
         for ticket in self.ticket_list:
             self.ui.listresult.addItem(ticket.name)
+
+    def copy_selected_button_action(self):
+        cursor = self.ui.commenttext.textCursor()
+        plainText = self.ui.commenttext.toPlainText()
+        pyperclip.copy(str(plainText[cursor.selectionStart():cursor.selectionEnd()]))
 
     def load_active_button_action(self):
         self.ui.listresult.clear()
