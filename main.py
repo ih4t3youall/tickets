@@ -38,6 +38,8 @@ class mywindow(QtWidgets.QMainWindow):
         self.ui.checkBox.stateChanged.connect(self.checkbox_action)
         self.ui.comborepo.currentIndexChanged.connect(self.combobox_action)
         self.ui.copy_selected_button.clicked.connect(self.copy_selected_button_action)
+        self.ui.search_button.clicked.connect(self.search_button_action)
+        self.ui.textsearch.returnPressed.connect(self.search_button_action)
 
         #copy
         self.ui.copy_name.clicked.connect(lambda: self.copy_button_action('name'))
@@ -169,6 +171,29 @@ class mywindow(QtWidgets.QMainWindow):
         cursor = self.ui.commenttext.textCursor()
         plainText = self.ui.commenttext.toPlainText()
         pyperclip.copy(str(plainText[cursor.selectionStart():cursor.selectionEnd()]))
+
+    def search_button_action(self):
+        srch_txt = self.ui.textsearch.text();
+        if srch_txt:
+            self.search_in_tickets(srch_txt)
+
+    def search_in_tickets(self,word):
+        self.ticket_list
+        newTicketList = list(filter(lambda x : self.search_filter(x,word)  ,self.ticket_list))
+        if newTicketList:
+            self.ui.listresult.clear()
+            for ticket in newTicketList:
+                self.ui.listresult.addItem(ticket.name)
+            self.ui.textsearch.clear()
+
+
+    def search_filter(self,ticket,word):
+        whole_text = ticket.name+ ticket.comments
+        try:
+            whole_text .index(word)
+            return True
+        except:
+            return False
 
     def load_active_button_action(self):
         self.ui.listresult.clear()
