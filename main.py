@@ -64,6 +64,11 @@ class mywindow(QtWidgets.QMainWindow):
     def init_search_box(self):
         for ticket in self.ticket_list:
             self.ui.listresult.addItem(ticket.name)
+        self.ui.listresult.itemClicked.connect(self.on_ticket_clicked)
+
+    def on_ticket_clicked(self,ticket):
+        searched_ticket = self.search_ticket(ticket.text())
+        self.display_ticket(searched_ticket)
 
     def load_combobox(self):
         self.ui.comborepo.addItem("nothing")
