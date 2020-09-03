@@ -34,7 +34,6 @@ class mywindow(QtWidgets.QMainWindow):
         self.ui.delete_button.clicked.connect(self.delete_button_action)
         self.ui.save_button.clicked.connect(self.save_button_action)
         self.ui.new_button.clicked.connect(self.new_button_action)
-        self.ui.load_button.clicked.connect(self.load_button_action)
         self.ui.load_active.clicked.connect(self.load_active_button_action)
         self.ui.load_all.clicked.connect(self.load_all_button_action)
         self.ui.checkBox.stateChanged.connect(self.checkbox_action)
@@ -64,15 +63,8 @@ class mywindow(QtWidgets.QMainWindow):
         self.repos['wlashTrader'] = 'https://github.com/ErisExchange/tradingWebApiClient'
 
     def closeEvent(self, event):
-        reply = QMessageBox.question(self, 'Window Close', 'Are you sure you want to close the window?',
-                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-
-        if reply == QMessageBox.Yes:
-            self.save_button_action()
-            event.accept()
-            print('Window closed')
-        else:
-            event.ignore()
+        self.save_button_action()
+        event.accept()
 
     def init_search_box(self):
         for ticket in self.ticket_list:
