@@ -1,4 +1,7 @@
 from PyQt5 import QtWidgets,QtGui
+import sys
+from PyQt5.QtWidgets import (QApplication, QWidget, QMessageBox)
+
 from objects import Ticket
 from objects import Disk
 from datetime import date
@@ -6,7 +9,6 @@ import pyperclip
 
 from ui.ticketui import Ui_MainWindow  # importing our generated file
 
-import sys
 
 
 
@@ -14,6 +16,7 @@ class mywindow(QtWidgets.QMainWindow):
 
     repos = {}
     ticket_list = []
+    new_ticket = False
 
     def __init__(self):
         super(mywindow, self).__init__()
@@ -28,7 +31,6 @@ class mywindow(QtWidgets.QMainWindow):
         self.init_search_box()
         
         #listeners
-        #self.ui.add_button.clicked.connect(self.add_button_action)
         self.ui.delete_button.clicked.connect(self.delete_button_action)
         self.ui.save_button.clicked.connect(self.save_button_action)
         self.ui.new_button.clicked.connect(self.new_button_action)
@@ -61,12 +63,24 @@ class mywindow(QtWidgets.QMainWindow):
         self.repos['web-api'] = 'https://github.com/ErisExchange/trading-web-api'
         self.repos['wlashTrader'] = 'https://github.com/ErisExchange/tradingWebApiClient'
 
+    def closeEvent(self, event):
+        reply = QMessageBox.question(self, 'Window Close', 'Are you sure you want to close the window?',
+                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+
+        if reply == QMessageBox.Yes:
+            self.save_button_action()
+            event.accept()
+            print('Window closed')
+        else:
+            event.ignore()
+
     def init_search_box(self):
         for ticket in self.ticket_list:
             self.ui.listresult.addItem(ticket.name)
         self.ui.listresult.itemClicked.connect(self.on_ticket_clicked)
 
     def on_ticket_clicked(self,ticket):
+        self.save_button_action()
         searched_ticket = self.search_ticket(ticket.text())
         self.display_ticket(searched_ticket)
 
@@ -126,10 +140,16 @@ class mywindow(QtWidgets.QMainWindow):
         self.ticket_list.pop(cont)
         self.ticket_list.append(new_ticket)
 
+    def clear_selection(self):
+        self.ui.listresult.clearSelection()
 
     def delete_button_action(self):
         ticket_to_delete = self.grab_from_view()
+        if ticket_to_delete.name == "":
+            print("ticket is blank")
+            return
         index =0
+        self.clear_all_form()
         for ticket in self.ticket_list:
             if ticket.name == ticket_to_delete.name:
                 print('i was here')
@@ -137,6 +157,8 @@ class mywindow(QtWidgets.QMainWindow):
             index = index +1
         self.ticket_list.pop(index)
         self.removeSel()
+        self.clear_selection()
+
 
     def removeSel(self):
         listItems = self.ui.listresult.selectedItems()
@@ -149,8 +171,11 @@ class mywindow(QtWidgets.QMainWindow):
         ticket_searched = self.search_ticket(ticket.name)
         if ticket_searched == None:
             print('adding new')
-            self.ticket_list.append(ticket)
-            self.ui.listresult.addItem(ticket.name)
+            if ticket.name == "":
+                print("cancel update")
+            else:
+                self.ticket_list.append(ticket)
+                self.ui.listresult.addItem(ticket.name)
         else:
             print('updating')
             self.update_ticket(ticket)
@@ -165,6 +190,7 @@ class mywindow(QtWidgets.QMainWindow):
         self.ui.commenttext.clear()
 
     def new_button_action(self):
+        self.new_ticket = True
         self.clear_all_form()
 
     def load_all_button_action(self):
